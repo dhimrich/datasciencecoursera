@@ -5,14 +5,16 @@ date: "Saturday, September 20, 2014"
 output: html_document
 ---
 
-I prepared only one script to fulfill the requirements of this project, run_analysis.R. It assembles data from the files in the UCI HAR Dataset zip file according to the diagram provided by David Hood in this thread on the course discussion forums.
+I prepared only one script to fulfill the requirements of this project, run_analysis.R. It assembles data from the files in the UCI HAR Dataset zip file 
+found at: https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+according to the diagram provided by David Hood in this thread on the course discussion forums.
 
 https://class.coursera.org/getdata-007/forum/thread?thread_id=49#comment-570
 ![data file diagram](File Diagram - David Hood.png)
 
 I ignored the inertial signals data in the zip file as the project requirements only specify that the mean and standard deviation variables from the processed "features" vectors are to be summarized.
 
-The run_analysis.R script specifies the files that it requires. These should be placed in the working directory. The script assembles sets for the training and test data with Activity and Subject columns added. It combines those two data sets together and adds descriptive column names for the measured variables extracted from the features.txt file provided with the data. See CODEBOOK.MD for the details of these variables.
+The comments at the beginning of th run_analysis.R script specify the files that it requires. These files should be placed in the working directory. The script assembles record sets for the training and test data with Activity and Subject columns added. It combines those two data sets together and adds descriptive column names for the measured variables extracted from the features.txt file provided with the data. See CODEBOOK.MD for the details of these variables.
 
 The run_analysis script selects the variables to be summarized as those which contain "mean()" or "std()" in the column names. There are 79 such columns among the measured variables. 
 
