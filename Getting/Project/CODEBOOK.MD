@@ -5,7 +5,7 @@ date: "Saturday, September 20, 2014"
 output: html_document
 ---
 
-This document is based on the file "feaures_info.txt" included in the zip file from which the UCI HAR data sets were extracted. The original inertial signal data stored on the smartphones were ignore for this project. The project requirements were that the mean and standard deviation variables should be summarized by calculating their means. Those variables were:
+This document is based on the file "feaures_info.txt" included in the zip file from which the UCI HAR data sets were extracted. The original inertial signal data stored on the smartphones were ignored for this project. The project requirements were that the mean and standard deviation variables should be summarized by calculating their means. Those variables were:
 
  [1] "tBodyAcc-mean()-X"               "tBodyAcc-mean()-Y"              
  [3] "tBodyAcc-mean()-Z"               "tBodyAcc-std()-X"               
@@ -51,8 +51,8 @@ This document is based on the file "feaures_info.txt" included in the zip file f
 The output data set columns 3 through 81 contain the mean values of these measurements for each combination of Activity and Subject. The variable names in columns 3 through 81 are those listed above, prepended with the string "avg.".
 
 There are 6 Activities, identified in Column 1 by the labels:
-[1] "WALKING"            "WALKING\_UPSTAIRS"   "WALKING\_DOWNSTAIRS"
-[4] "SITTING"            "STANDING"           "LAYING"            
+ "WALKING"            "WALKING\_UPSTAIRS"   "WALKING\_DOWNSTAIRS"
+ "SITTING"            "STANDING"           "LAYING"            
 
 The variable name for column 1 is "Activity2".
 

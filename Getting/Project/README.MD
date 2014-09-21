@@ -14,7 +14,7 @@ https://class.coursera.org/getdata-007/forum/thread?thread_id=49#comment-570
 
 I ignored the inertial signals data in the zip file as the project requirements only specify that the mean and standard deviation variables from the processed "features" vectors are to be summarized.
 
-The comments at the beginning of th run_analysis.R script specify the files that it requires. These files should be placed in the working directory. The script assembles record sets for the training and test data with Activity and Subject columns added. It combines those two data sets together and adds descriptive column names for the measured variables extracted from the features.txt file provided with the data. See CODEBOOK.MD for the details of these variables.
+The comments at the beginning of the run_analysis.R script specify the files that it requires. These files should be placed in the working directory. The script assembles record sets for the training and test data with Activity and Subject columns added. It combines those two data sets together and adds descriptive column names for the measured variables extracted from the features.txt file provided with the data. See CODEBOOK.MD for the details of these variables.
 
 The run_analysis script selects the variables to be summarized as those which contain "mean()" or "std()" in the column names. There are 79 such columns among the measured variables. 
 
