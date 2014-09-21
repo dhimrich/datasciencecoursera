@@ -48,4 +48,12 @@ This document is based on the file "feaures_info.txt" included in the zip file f
 [77] "fBodyBodyGyroJerkMag-mean()"     "fBodyBodyGyroJerkMag-std()"     
 [79] "fBodyBodyGyroJerkMag-meanFreq()"
 
-All of these variables are summarized in the file smartphone_data.txt by taking their means within groups by Activity and Subject.
+The output data set columns 3 through 81 contain the mean values of these measurements for each combination of Activity and Subject. The variable names in columns 3 through 81 are those listed above, prepended with the string "avg.".
+
+There are 6 Activities, identified in Column 1 by the labels:
+[1] "WALKING"            "WALKING\_UPSTAIRS"   "WALKING\_DOWNSTAIRS"
+[4] "SITTING"            "STANDING"           "LAYING"            
+
+The variable name for column 1 is "Activity2".
+
+Column 2 contains integers 1 through 30 designating the 30 Subjects of the study, each of whom performed 6 different Activities while wearing a smartphone. The variable name is "Subject". Together, the variables in columns 1 and 2 identify 180 groups of measurements. The means of the 79 variables listed above within each of those 180 groups appear together on each row in the data set.
