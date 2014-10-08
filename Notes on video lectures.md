@@ -1,6 +1,6 @@
-### Wk 1 Reproducible Research: Organizing your Analysis
+# Wk 1 Reproducible Research: Organizing your Analysis
 ## Raw Data
-# Store URL and date of access 
+### Store URL and date of access 
  * You can put access info in commit notes if you use Git
 ## Processed Data
 * Name it so you know what script produced it
