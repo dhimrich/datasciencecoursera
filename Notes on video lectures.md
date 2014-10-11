@@ -7,10 +7,13 @@
 * Name it so you know what script produced it
 * Put mapping from scripts to processed data in the README file
 * Processed data should be __tidy__
+
 ## Exploratory Figures
 * Might be lots, they are just for your use
+
 ## Final Figures
 * Small subset of all the figures you made
+
 ## Raw scripts
 
 ## Final scripts
