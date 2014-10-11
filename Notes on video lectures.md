@@ -2,6 +2,7 @@
 ## Raw Data
 ### Store URL and date of access 
  * You can put access info in commit notes if you use Git
+
 ## Processed Data
 * Name it so you know what script produced it
 * Put mapping from scripts to processed data in the README file
