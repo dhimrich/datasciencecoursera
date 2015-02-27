@@ -1,0 +1,53 @@
+---
+title: "Statistical Inference Class Project, Part 1"
+author: "David Himrich"
+date: "Sunday, November 16, 2014"
+output: pdf_document
+---
+
+We can create a set of means of 40 random exponential numbers with lambda = 0.2 by modifying the R code found in the description of the assignment.
+
+```{r}
+mns = NULL
+set.seed(123)
+for (i in 1 : 1000) mns = c(mns, mean(rexp(40, 0.2)))
+
+```
+
+**Question 1:** Show where the distribution is centered at and compare it to the theoretical center of the distribution.
+
+The center of the set of simulated means is their mean value, `r mean(mns)`
+```{r}
+mean(mns) # center of simulated means
+```
+
+The theoretical mean of the exponential distribution is 1/lambda, or `r 1/0.2`. A histogram of the distribution will help display the shape of the distribution of the mean and also how similar are the theoretical and actual means:
+```{r, fig.height=4, fig.width=6}
+hist(mns)
+abline(v=mean(mns), col=2)
+abline(v=1/0.2, col=2, lty=2)
+```
+
+The lines for the calculated mean (solid) and the theoretical mean (dashed) are almost indistinguishable from each other when compared to the entire distribution.
+
+**Question 2:** Show how variable it is and compare it to the theoretical variance of the distribution.
+
+The variance of the simulated means is `r var(mns)`. The theoretical variance of the means is the square of the theoretical standard deviation of the parent distribution divided by thenumber in the sample: `r (1/0.2)^2/40`.
+```{r}
+var(mns) # variance of simulated means
+(1/0.2)^2/40 # theoretical variance of means of 40 exponentials, lambda=0.2
+
+```
+
+**Question 3:** Show that the distribution (of sample means) is approximately normal.
+
+The assignment text suggests that we examine this question by comparing a large collection of random exponentials with a large collection of means of 40 random exponentials, which we can do by means of a pair of histograms:
+```{r}
+par(mfrow = c(2,1))
+set.seed(123)
+hist(rexp(40000,0.2), main="40,000 Random Exponentials", xlim=c(0,30))
+hist(mns, main="1000 Means of 40", xlim=c(0,30))
+
+```
+
+We can see that the distribution of the means is similar to a normal distribution, in comparison with the parent distribution.

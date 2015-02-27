@@ -1,0 +1,40 @@
+.Rproj.user
+.Rhistory
+.RData
+*.pdf
+*.html
+*.xlsx
+02_03_commandLineInterface.pdf
+02_07_basicGitCommands.pdf
+03_01_typesOfQuestions.pdf
+03_02_whatIsData.pdf
+03_03_whatAboutBigData.pdf
+03_04_experimentalDesign.pdf
+RStudio Screenshot.bmp
+RStudio Screenshot.jpg
+Thumbs.db
+Toolbox.Rproj
+Toolbox Files
+.httr-oauth
+Programming
+Assign_2.R
+Hospital_Revised_Flatfiles.pdf
+best.R
+complete.R
+corr.R
+hospital-data.csv
+hw1_data.csv
+outcome-of-care-measures.csv
+pollutantmean.R
+rankall.R
+rankhospital.R
+rprog-data-ProgAssignment3-data.zip
+rprog-doc-ProgAssignment3.pdf
+specdata
+Interaction.png
+elimination.R
+fitting.R
+hunger.csv
+swissLMs.R
+vifSims.R
+gh-pages tips.txt

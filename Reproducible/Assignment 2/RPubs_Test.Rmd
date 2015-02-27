@@ -1,0 +1,19 @@
+---
+title: "RPubs Test"
+author: "David Himrich"
+date: "Sunday, October 19, 2014"
+output: html_document
+---
+
+# Test of RPubs Publishing
+Just a fews rows of storm data and some summaries
+```{r}
+##storm.test <- read.csv("repdata-data-StormData.csv", nrows = 100)
+##summary(storm.test$CROPDMG)
+##summary(storm.test$PROPDMG)
+storm.test2 <- read.table("repdata-data-StormData.csv.bz2", header=TRUE, sep=",", nrows = 100)
+summary(storm.test2$CROPDMG)
+summary(storm.test2$PROPDMG)
+
+```
+

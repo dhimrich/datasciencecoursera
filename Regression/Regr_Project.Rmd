@@ -1,0 +1,94 @@
+---
+title: "Regression Models Course Project"
+author: "David Himrich"
+date: "Saturday, January 24, 2015"
+output: pdf_document
+---
+
+# Executive Summary
+
+Weight is the variable with the greatest influence on MPG. Transmission type interacts with weight by altering the rate at which increased weight reduces MPG. For the cars we tested with manual transmissions, every 1000 pound increase in weight reduces MPG by 9.1 miles per gallon. For cars with automatic transmissions, the MPG decreases 3.8 miles per gallon with every 1000 pound increase in weight.
+
+# Introduction
+I was asked to adress these two issues about related to our road tests of 1973 and 1974 models:
+
+* Is an automatic or manual transmission better for MPG?
+* Quantify the MPG difference between automatic and manual transmissions
+
+I found that the answers are not completely straightforward, but there are some worthwhile insights about transmission type and MPG to be derived from our data.
+
+# Data Exploration
+I began by examining the relationship between MPG and all the other variables in the data set. Only the "wt" variable (weight in 1000lb units) is significant (p = 0.06) in this model. The next most significant (p = 0.23) variable is "am", which designates transmission type and is our variable of interest. These results suggest that we must account for the effect of weight in our investigation of tranmission types and MPG.
+
+We face an additional complication in that weight and transmission type are correlated. In this case, most of the heavier vehicles have automatic transmissions, and most of the lighter vehicles have manual transmissions. Since weight has great influence on MPG, this correlation makes it more difficult to quantify the effect of transmission. We really cannot describe the effect of transmission type separately; we must discuss its effect together with that of weight. This kind of relationship between variables is called an "interaction".
+
+# Linear Modeling
+Our chosen model is:
+```{r}
+fit3 <- lm(mpg ~ am + wt + am*wt, mtcars)
+fit3$coefficients
+```
+Both variables and their interaction have significant effects on MPG. Because of the interaction, we cannot speaking meaningfully of separate effects for transmission type or weight, They work together to influence MPG.
+
+# Graphical Summary
+Perhaps the best way to understand the influence of these two variables on MPG is via a graph:
+```{r, fig.width=5, fig.height=3, fig.cap="Figure 1"}
+par(mfrow = c(1,1))
+fitA3 <- lm(mpg ~ wt, mtcars[mtcars$am==0, ])
+fitM3 <- lm(mpg ~ wt, mtcars[mtcars$am==1, ])
+with(mtcars, plot(wt, mpg, col=am+1, pch=19, 
+                  xlab="weight x 1000 lbs", ylab="MPG"))
+lines(fitA3$model[,2], predict(fitA3), type="l", lwd=2, col=1)
+lines(fitM3$model[,2], predict(fitM3), type="l", lwd=2, col=2)
+title(main="MPG by Weight and Transmission Type")
+legend("topright", legend=c("auto.", "manual"), text.col=1:2)
+
+```
+
+This graph plots MPG against weight, with transmission type represent by color. The black points are the cars with automatic transmissions, the red points are cars with manual transmission. The black line is the best fit line of MPG against weight, but only for the cars with automatics. Similarly, the red line is the best fit model of MPG against weigh for the cars with manual transmissions.
+
+Combining the models that produced these two lines produces our model with transmission type, weight, and the interaction, and we can use them to describe the model effects:
+
+* For cars with manual transmissions, a 1000 lb increase in weight reduces MPG by 9.1 units. (The slope of the red line is -9.1 MPG/1000lbs.)
+* For cars with automatic transmissions, a 1000 lb increase in weight reduces MPG by 3.8 units. (The slope of the black line is -3.8 MPG/1000lbs.)
+We confirm that these effects are predicted by our original model by noting that in the _original model_, coefficient of the "wt" variable is -3.8 units, which corresponds to the slope of the black line on our graph. The coefficient of the interaction term in our original model is -5.3. This coefficient is summed with coefficent due to weight for automatic transmissions to produce the effect of weight with manual transmissions: -3.8 - 5.3 = -9.1, which is the slope of the red line on the graph.
+
+-------------
+
+# Appendix
+
+
+```{r}
+## Model with all variables.
+summary(lm(mpg ~ ., mtcars))
+```
+
+```{r, fig.width=5, fig.height=2, fig.cap="Figure A1"}
+par(mfrow = c(1,2))
+par(mar=c(2,4,2,2))
+with(mtcars, boxplot(mpg ~ am, names=c("auto.", "manual"), boxwex=0.5, ylab="MPG"))
+with(mtcars, boxplot(wt ~ am, names=c("auto.", "manual"), boxwex=0.5, ylab="Weight x 1000 lbs"))
+
+```
+
+
+```{r}
+## The selected model:
+summary(fit3)
+```
+
+
+```{r}
+## Coefficients of the models separated by transmission type for plotting:
+fitA3$coefficients
+fitM3$coefficients
+```
+
+
+
+```{r, fig.width=5, fig.height=5}
+## Diagnostics of the selected model:
+par(mfrow=c(2,2))
+plot(fit3)
+```
+

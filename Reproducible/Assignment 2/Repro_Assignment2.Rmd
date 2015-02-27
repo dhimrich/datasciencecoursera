@@ -1,0 +1,296 @@
+---
+title: "Impacts of Weather Events on Lives and Property in the United States Since 1950"
+author: "David Himrich"
+date: "Sunday, October 26, 2014"
+output: html_document
+---
+
+# Synopsis
+The U.S. National Weather Service maintains a database of weather events recorded starting in 1950. The records include estimates of the number deaths, injuries, property damage, and crop damage caused by each event. The database lists more than 900 different event types, many of which are very similar and probably should be considered in groups. After grouping the events, we find that tornadoes produce far more deaths and injuries than other groups. We find that flooding produces by far the most property damage, and we find that drought and flooding are both major causes of crop damage.
+
+# Data Processing
+National Weather Service Storm Data is available [here](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2). We can read the compressed file into R directly (this may be time-consuming):
+
+
+```{r cache=TRUE}
+storm.data <- read.table("repdata-data-StormData.csv.bz2", header=TRUE, sep=",")
+
+```
+
+We are interested in evaluating the effects on people and property of various weather events defined by the EVTYPE (event type) variable in the National Weather Service storm database. This data set includes 985 different values for EVTYPE, many of which are similar. It appears that most of the records are not associated with any fatalities, injuries, crop damage, or property damage:
+
+```{r message=FALSE}
+library(plyr)
+library(dplyr)
+
+summary(storm.data$FATALITIES)
+summary(storm.data$INJURIES)
+summary(storm.data$CROPDMG)
+summary(storm.data$PROPDMG)
+
+```
+
+We also find from review the [FAQ](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2FNCDC%20Storm%20Events-FAQ%20Page.pdf) and [Documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf) for the data set that the CROPDMGEXP and PROPDMGEXP variables contain codes that multiply the values in the CROPDMG and PROPDMG fields. To assess economic impact we will need to account for these multipliers.
+
+The codes appearing in CROPDMGEXP (and their frequencies) are:
+```{r}
+table(storm.data$CROPDMGEXP)
+```
+
+The codes appearing in CROPDMGEXP (and their frequencies) are:
+```{r}
+table(storm.data$PROPDMGEXP)
+```
+
+While the meaning of all of these codes is not obvious, it appears that "B" designates billion, "m" or "M" designates millions, and "k" or "K" designates thousands. We will create multiplier variables for the CROPDMG and PROPDMG values to correctly assess the impacts from the various weather events.
+
+The default values of the multipliers should be 1:
+
+```{r}
+storm.data$CROPMULT <- 1L
+storm.data$PROPMULT <- 1L
+```
+
+Set the values of CROPMULT  and PROPMULT according to the values of CROPDMGEXP that we can interpret:
+
+```{r}
+storm.data$CROPMULT[storm.data$CROPDMGEXP %in% c("k", "K")] <- 1000
+storm.data$CROPMULT[storm.data$CROPDMGEXP %in% c("m", "M")] <- 10^6
+storm.data$CROPMULT[storm.data$CROPDMGEXP %in% c("B")] <- 10^9
+
+storm.data$PROPMULT[storm.data$PROPDMGEXP %in% c("k", "K")] <- 1000
+storm.data$PROPMULT[storm.data$PROPDMGEXP %in% c("m", "M")] <- 10^6
+storm.data$PROPMULT[storm.data$PROPDMGEXP %in% c("B")] <- 10^9
+
+```
+
+Now we will create variables to hold the total dollar values of crop and property damage using the original variables and the multipliers we just defined:
+
+```{r}
+storm.data$CROPTOTAL <- storm.data$CROPDMG * storm.data$CROPMULT
+storm.data$PROPTOTAL <- storm.data$PROPDMG * storm.data$PROPMULT
+```
+
+With these dollar values defined, we are prepared to examine the EVTYPE values that create the greatest impacts on people and property. We can begin by looking at the event types that causing the greatest number of fatalities and injuries
+
+```{r}
+casualties <- storm.data %>% group_by(EVTYPE) %>% 
+  summarize(Deaths=sum(FATALITIES), Injured=sum(INJURIES))
+head(arrange(casualties, desc(Deaths)), 20)
+head(arrange(casualties, desc(Injured)), 20)
+
+```
+
+These "top 20" lists of EVTYPE by deaths and injuries, along with other examinations of the many event types that have been added over the years, suggest that our investigation might benefit by combining similar events together. We will do this somewhat informally by creating a new column named "SuperType". We will select key words from the EVTYPE field and assign SuperType.
+
+```{r}
+## First make all the SuperTypes NA
+storm.data$SuperType <- NA
+
+## Assign SuperType "Tornado" to all EVTYPE containg "TORNADO"
+storm.data$SuperType[grep("TORNADO", storm.data$EVTYPE, ignore.case = TRUE)] <-    "Tornado"
+
+## We will assign other types to rows that have not already been assigned according to our top 20 lists and explorations of EVTYPE
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("HEAT", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Heat"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("FLOOD| FLD", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Flood"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("THUNDERSTORM|TSTM", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Thunderstorm"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("LIGHTNING", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Lightning"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("HURRICANE", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Hurricane"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("COLD", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Cold"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("WINTER|BLIZZARD", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Winter Weather"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("SNOW|ICE", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Winter Weather"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("RIP.+CURRENT", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Rip Current"
+
+```
+
+Having assigned a number of categories based on casualty counts, we can see what proportion of deaths and injuries remain unaccounted for by the SuperType categories:
+
+```{r}
+with(storm.data, sum(FATALITIES[is.na(SuperType)])/sum(FATALITIES))
+with(storm.data, sum(INJURIES[is.na(SuperType)])/sum(INJURIES))
+
+```
+
+With both unassigned proportions less than 10 percent of the totals, we can probably move on to assessing what events have caused the most economic damage.
+
+```{r}
+economic <- storm.data %>% group_by(EVTYPE) %>% 
+  summarize(Crop=sum(CROPTOTAL), Property=sum(PROPTOTAL))
+head(arrange(economic, desc(Crop)), 20)
+head(arrange(economic, desc(Property)), 20)
+```
+
+We can use these economic damage top 20 lists to assign additional SuperTypes.
+
+```{r}
+## We will define storm surge as a form of flooding
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("STORM SURGE", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Flood"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("HAIL", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Hail"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("TROPICAL STORM", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Tropical Storm"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("FIRE", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Fire"
+
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("DROUGHT", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Drought"
+
+## There are some wind events not part of thunderstorms
+storm.data$SuperType[is.na(storm.data$SuperType) & 
+                             grepl("WIND", storm.data$EVTYPE, 
+                                  ignore.case = TRUE)] <- "Wind"
+
+```
+
+Now we can check to see if we have accounted for most of the economic damage with these additional SuperTypes:
+
+```{r}
+with(storm.data, sum(PROPTOTAL[is.na(SuperType)])/sum(PROPTOTAL))
+with(storm.data, sum(CROPTOTAL[is.na(SuperType)])/sum(CROPTOTAL))
+
+```
+
+Having now accounted for most of the casualties and economic damage with our SuperTypes, we can assign the records with NA SuperTypes with their original EVTYPE values as the SuperType.
+
+```{r}
+storm.data$SuperType[is.na(storm.data$SuperType)] <- 
+  as.character(storm.data$EVTYPE[is.na(storm.data$SuperType)])
+```
+
+
+# Results
+
+Now we can group and summarize the data by the new SuperType variable and have better insight into the effect of weather events.
+
+```{r}
+results <- storm.data %>% group_by(SuperType) %>% 
+  summarize(injured=sum(INJURIES), deaths=sum(FATALITIES), 
+            crop_dmg=sum(CROPTOTAL), prop_dmg=sum(PROPTOTAL), 
+            avg_injured=mean(INJURIES, na.rm = TRUE), 
+            avg_deaths=mean(FATALITIES, na.rm = TRUE),
+            avg_crop_dmg=mean(CROPTOTAL, na.rm = TRUE), 
+            avg_prop_dmg=mean(PROPTOTAL, na.rm = TRUE))
+
+```
+
+## Impacts to Populations
+
+The top event types in terms of total deaths:
+
+```{r, results='asis'}
+results <- arrange(results, desc(deaths))
+knitr::kable(results[1:10, c("SuperType", format("deaths", big.mark = ","), 
+                             "avg_deaths")], digits=3)
+
+```
+
+We see that tornadoes, heat, and flooding cause substantially more deaths than the other types of events. It's interesting to note the differences in the average number of deaths per event in this list. The heat events are much more lethal on average than tornadoes or floods. Some other event types, such as rip currents and avalanche, are individually very lethal, but are limited in frequency or extent compared to the events near the top of this list.
+
+The top events in terms of total injuries:
+
+```{r, results='asis'}
+results <- arrange(results, desc(injured))
+knitr::kable(results[1:10, c("SuperType", "injured", "avg_injured")], digits=3)
+
+```
+
+Tornadoes produce almost an order of magnitude more injuries than the next highest type, thunderstorms (a phenomenon closely related to tornadoes.) It's interesting to note that hurricanes did not appear in the top 10 death-producing event types, and appear only in 10th position on the injuries list, despite their very large areal extents. This difference may be due to the warning time available for hurricanes as compared to tornadoes and thunderstorms.
+
+It might be useful to look at tornado deaths and injuries by year.
+
+```{r, fig.height=6, fig.width=6}
+library(chron)
+tornado_by_year <- storm.data %>% filter(SuperType == "Tornado") %>% 
+  group_by(year=years(as.Date(BGN_DATE, format="%m/%d/%Y"))) %>% summarize(count=n(), 
+                                                   casualties = sum(FATALITIES) + 
+                                                     sum(INJURIES))
+par(mfrow = c(2,1))
+par(mar = c(2, 4, 2, 2))
+with(tornado_by_year, { # First plot count of tornadoes by year
+  plot(year, count, type="l", xlab="", ylab="count of tornadoes");
+  # Then plot the deaths + injuries by year
+  plot(year, casualties, type="l", xlab="", ylab = "deaths + injuries");
+}
+)
+print("Fig. 1: Tornado Counts and Casualties by Year")
+
+par(mar = c(5, 4, 4, 2) + 0.1)
+par(mfrow = c(1,1))
+
+```
+
+These charts suggest that while the number of tornadoes seems to have increased since 1950, the number of casualties does not display a similar trend. It seems possible that increase in tornado counts is due to better detection technology.
+
+## Economic Consequences
+
+The top event types in terms of property damage:
+
+```{r, results='asis'}
+results <- arrange(results, desc(prop_dmg))
+knitr::kable(results[1:10, c("SuperType", "prop_dmg", "avg_prop_dmg")], digits=3)
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(results[1:5, ], aes(x = SuperType, y = prop_dmg)) + 
+  scale_x_discrete(limits=c("Flood", "Hurricane", "Tornado", "Hail", "Winter Weather")) + 
+  ylab("Property Damage") + geom_bar(stat="identity")
+print("Fig. 2: Top Causes of Property Damage")
+```
+
+Flooding dominates this list. We also see impact of the sheer size of hurricanes. An average hurricane causes almost $300 million in property damage, the average tropical storm over $10 million. It seems reasonable that warnings and evacuations may help prevent casualties due to these tropical storms, but can do little to limit property damage.
+
+The top event types in terms of crop damage:
+
+```{r, results='asis'}
+results <- arrange(results, desc(crop_dmg))
+knitr::kable(results[1:10, c("SuperType", "crop_dmg", "avg_crop_dmg")], digits=3)
+
+ggplot(results[1:5, ], aes(x = SuperType, y = crop_dmg)) + 
+  scale_x_discrete(limits = c("Drought", "Flood", "Hurricane", "Winter Weather", "Hail")) + 
+  ylab("Crop Damage") + geom_bar(stat="identity")
+print("Fig. 3: Top Causes of Crop Damage")
+```
+
+Here we see the unique impact of drought on agriculture. Drought events probably affect much larger areas for much longer durations than most of the events considered here.
+
+# Conclusions
+Emergency managers would be well-advised to assess the potential for tornadoes, flooding and hurricane in their regions. Risk of these events vary widely by region, but in affected regions, these events cause enormous property damage. In addition, tornadoes produce many casualties. Planning targeted at improving tornado warnings and the response of the public to tornado warnings could reduce those casualties.
+
+Reducing property damage would seem to require planning and polices aimed at encouraging changes in the location and types of construction. 

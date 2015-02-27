@@ -1,0 +1,60 @@
+---
+title: "Statistical Inference Class Project Part 2"
+author: "David Himrich"
+output: pdf_document
+---
+## Introduction
+This portion of the project refers to the ToothGrowth data found in the datasets package of R. From the Description in the R Documentation:
+
+  >The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
+  
+## Data Exploration
+We can use various R commands to summarize the data set and understand its structure:
+
+```{r}
+data(ToothGrowth)
+str(ToothGrowth)
+table(ToothGrowth$dose, ToothGrowth$supp)
+```
+
+Boxplots may be helpful to relate the tooth growth response variable to the experimental dose level (dose) and delivery method (supp) variables:
+
+```{r, fig.height=3, fig.width=6.5}
+par(mfrow=c(1,2))
+with(ToothGrowth, boxplot(len ~ dose, main="Tooth Growth vs. \nDose Level", 
+                          xlab="Dose Level (mg)", ylab="Tooth Length"))
+
+with(ToothGrowth, boxplot(len ~ supp, 
+                          main="Tooth Growth vs. Supplement \nDelivery Method", 
+                          xlab="Delivery Method", ylab="Tooth Length"))
+title(sub="OJ = orange juice, VC = ascorbic acid")
+```
+
+## Comparisons
+Given three dosage levels and the requirement to limit this report to techniques that have been addressed by the course so far, we will use pairwise comparisons of the three groups of tooth length measurements. We can create three sets of measurements to compare:
+
+```{r}
+l.5 <- ToothGrowth$len[ToothGrowth$dose == 0.5]
+l1 <- ToothGrowth$len[ToothGrowth$dose == 1]
+l2 <- ToothGrowth$len[ToothGrowth$dose == 2]
+
+```
+
+Now we can do three pairwise comparisons of these variables, and also perform a 2-sample test on the 2-level "supp" variable:
+
+```{r}
+t.test(l.5, l1)
+t.test(l.5, l2)
+t.test(l1, l2)
+t.test(len ~ supp, ToothGrowth)
+
+```
+
+## Conclusions
+The assumptions for the Welch t-tests we have used are:
+1. The length measurements by the dose and supp groups are independent of each other. For this data set we are assuming that the measurements came from 60 distinct guinea pigs assigned at random to dose and supp groups.
+2. The length measurements are normally distributed (the boxplots suggest that this is not unreasonable).
+
+For the three dosage levels, the p-values are very low and the 95% confidence intervals exclude zero. These results suggest that average tooth lengths differ for each of the three dosage groups. We might have chosen to omit one comparison on the grounds that only two comparisons are independent, but included all three for the sake of completeness. 
+For the two levels of supp (delivery method), the p-value is 0.061 and the 95% confidence interval includes zero. These results suggest that the average tooth lengths for these delivery methods do not differ at the 95% confidence level. However, if delivery method has important economic or technical consequences, the observed difference in the groups suggests that further investigation may be beneficial.
+ 
