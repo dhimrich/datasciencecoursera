@@ -19,8 +19,7 @@ shinyUI(
       # Define the sidebar with plot choice inputs
       sidebarPanel(
         # Select the date of the data set, also called the follow-up date
-        dateInput("fdate", "Date of Data:", date(), 
-                  min=max(life_data.df$Start.Date)),
+        dateInput("fdate", "Date of Data:"),
         hr(),
         helpText("This is the date through which the run times are known."),
         
@@ -37,7 +36,9 @@ shinyUI(
       # Create a spot for the barplot
       mainPanel(
         h3(textOutput("Survival Plot")),
-        plotOutput("survplot")
+        plotOutput("survplot"),
+        hr()
+        
       )
     )
 ))
