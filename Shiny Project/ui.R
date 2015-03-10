@@ -33,11 +33,11 @@ shinyUI(
         
         ),
       
-      # Create a spot for the barplot
+      # Create a spot for the survival plot
       mainPanel(
-        h3(textOutput("Survival Plot")),
         plotOutput("survplot"),
-        hr()
+        hr(),
+        tableOutput("bsumm")
         
       )
     )

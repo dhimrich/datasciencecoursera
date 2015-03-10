@@ -12,16 +12,18 @@ life_data.df <- read.csv("life_data.csv",
 shinyServer(function(input, output) {
   
   # Calculate the run days for the data set based on the follow-up date
-  # Set them all equal to the follow-up date less the Start Date
+  # Set them all equal to the Stop Date less the Start Date
   
   RDays <- reactive({
-    life_data.df$fdate <- input$fdate
-    life_data.df$Rdays <- as.numeric(life_data.df$fdate - 
-                                       life_data.df$Start.Date)
-    # Then for the records with Stop Dates, the days should be Stop - Start
-    life_data.df$RDays[!is.na(life_data.df$Stop.Date)] <- 
-      as.numeric(life_data.df$Stop.Date[!is.na(life_data.df$Stop.Date)] - 
-      life_data.df$Start.Date[!is.na(life_data.df$Stop.Date)])
+    ## Make an end date that is by default the Stop Date
+    life_data.df$End.Date <- life_data.df$Stop.Date
+    
+    ## For the missing Stop Dates, the End Date is the input follow-up date
+    life_data.df$End.Date[is.na(life_data.df$End.Date)] <- as.Date(input$fdate)
+    
+    ## Now the run days for each system is End Date less Start Date
+    life_data.df$RDays <- as.numeric(life_data.df$End.Date
+                                               - life_data.df$Start.Date)
     life_data.df$RDays
   })
   
@@ -34,11 +36,13 @@ shinyServer(function(input, output) {
   comb.fit <- reactive({
     survfit(Surv(time=RDays(), event=Failed()) ~ 1, )
   })
-  
-  
-    
+      
   output$survplot <- renderPlot({
-    plot(comb.fit())
+    plot(comb.fit(), main="Abbott & Costello Combined Survival")
+  })
+  
+  output$bsumm <- renderTable({
+    data.frame(t(summary(comb.fit())$table))
   })
   
 })
