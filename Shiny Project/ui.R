@@ -37,7 +37,10 @@ shinyUI(
       mainPanel(
         plotOutput("survplot"),
         hr(),
-        tableOutput("bsumm")
+        tableOutput("bsumm"),
+        tableOutput("survtable"),
+        hr(),
+        dataTableOutput("dataset")
         
       )
     )

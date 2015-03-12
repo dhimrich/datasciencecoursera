@@ -32,17 +32,41 @@ shinyServer(function(input, output) {
     life_data.df$Failed
   })
   
+  ## Create a reactive version of the Asset variable  
+  Asset <- reactive({
+    life_data.df$Asset
+  })
+  
   ## Calculate the combined survival fit
   comb.fit <- reactive({
     survfit(Surv(time=RDays(), event=Failed()) ~ 1, )
   })
       
-  output$survplot <- renderPlot({
-    plot(comb.fit(), main="Abbott & Costello Combined Survival")
+  ## Calculate the survival fit by Asset
+  asset.fit <- reactive({
+    survfit(Surv(time=RDays(), event=Failed()) ~ Asset())
   })
   
+#   output$survplot <- renderPlot({
+#     plot(comb.fit(), main="Abbott & Costello Combined Survival")
+#   })
+  
+  output$survplot <- renderPlot({
+    plot(asset.fit(), main="Survival by Asset", col=1:2)
+    legend("bottomleft", legend=c("Abbott", "Costello"), text.col=1:2)
+  })
+
   output$bsumm <- renderTable({
     data.frame(t(summary(comb.fit())$table))
   })
+  
+  output$survtable <- renderTable({
+    as.data.frame(summary(comb.fit(), times=c(30,90,180,365))[c("time","n.risk",
+                                                  "n.event", "surv")])
+  })
+  
+  output$dataset <- renderDataTable({
+    cbind(life_data.df, RDays())
+  }, options = list(lengthMenu = c(5, 10, 20), pageLength = 5))
   
 })
