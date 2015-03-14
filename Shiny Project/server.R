@@ -10,7 +10,7 @@ life_data.df <- read.csv("life_data.csv",
                                       "logical"))
 
 shinyServer(function(input, output) {
-  
+      
   # Calculate the run days for the data set based on the follow-up date
   # Set them all equal to the Stop Date less the Start Date
   
@@ -37,32 +37,53 @@ shinyServer(function(input, output) {
     life_data.df$Asset
   })
   
-  ## Calculate the combined survival fit
-  comb.fit <- reactive({
-    survfit(Surv(time=RDays(), event=Failed()) ~ 1, )
-  })
-      
-  ## Calculate the survival fit by Asset
-  asset.fit <- reactive({
-    survfit(Surv(time=RDays(), event=Failed()) ~ Asset())
+#   ## Calculate the combined survival fit
+#   comb.fit <- reactive({
+#     survfit(Surv(time=RDays(), event=Failed()) ~ 1, )
+#   })
+#       
+#   ## Calculate the survival fit by Asset
+#   asset.fit <- reactive({
+#     survfit(Surv(time=RDays(), event=Failed()) ~ Asset())
+#   })
+#   
+  ## Choose the fit that will be displayed according to the checkbox inputs
+  
+    ## Assign the combined fit to be displayed
+  display.fit <- reactive({
+    if (input$plotType == 1) {
+      survfit(Surv(time=RDays(), event=Failed()) ~ 1, )
+      } else {
+      survfit(Surv(time=RDays(), event=Failed()) ~ Asset())
+    }
   })
   
-#   output$survplot <- renderPlot({
-#     plot(comb.fit(), main="Abbott & Costello Combined Survival")
-#   })
+  display.title <- reactive({
+    if (input$plotType == 1) {
+      "Combined Survival"
+    } else {
+      "Survival by Asset"
+    }
+  })
   
   output$survplot <- renderPlot({
-    plot(asset.fit(), main="Survival by Asset", col=1:2)
-    legend("bottomleft", legend=c("Abbott", "Costello"), text.col=1:2)
-  })
-
-  output$bsumm <- renderTable({
-    data.frame(t(summary(comb.fit())$table))
+    plot(display.fit(), main=display.title(), col=1:input$plotType)
+    if (input$plotType == 2) {
+      legend("bottomleft", legend=unique(Asset()), 
+             text.col=1:input$plotType)
+    }
   })
   
+
+#   output$bsumm <- renderTable({
+#     summary(display.fit()$table)
+#     
+#   })
+  
   output$survtable <- renderTable({
-    as.data.frame(summary(comb.fit(), times=c(30,90,180,365))[c("time","n.risk",
+    as.data.frame(summary(display.fit(), times=c(30,90,180,365))[c("time","n.risk",
                                                   "n.event", "surv")])
+    
   })
   
   output$dataset <- renderDataTable({
