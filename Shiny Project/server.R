@@ -37,16 +37,6 @@ shinyServer(function(input, output) {
     life_data.df$Asset
   })
   
-#   ## Calculate the combined survival fit
-#   comb.fit <- reactive({
-#     survfit(Surv(time=RDays(), event=Failed()) ~ 1, )
-#   })
-#       
-#   ## Calculate the survival fit by Asset
-#   asset.fit <- reactive({
-#     survfit(Surv(time=RDays(), event=Failed()) ~ Asset())
-#   })
-#   
   ## Choose the fit that will be displayed according to the checkbox inputs
   
     ## Assign the combined fit to be displayed
@@ -67,10 +57,13 @@ shinyServer(function(input, output) {
   })
   
   output$survplot <- renderPlot({
-    plot(display.fit(), main=display.title(), col=1:input$plotType)
+    plot(display.fit(), main=display.title(), col=1:input$plotType,
+         xlab="Run Days", ylab="Proportion Surviving")
     if (input$plotType == 2) {
       legend("bottomleft", legend=unique(Asset()), 
              text.col=1:input$plotType)
+    } else {
+      title(sub="Dashed lines = 95% conf. limits")
     }
   })
   
