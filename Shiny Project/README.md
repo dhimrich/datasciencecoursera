@@ -1,6 +1,7 @@
-Things still to do in survival Shiny App
+# Coursera Data Products
 
-* Make the github repo?
-* Build suitable output for the brief summary section, depending on what type of fit has been selected
-* Build useful labeling by Asset into the survival table when the "by Asset" plot type has been selected
-* Add enough documentation to the App so that a novice can operate it, per the project rubric
+## Course Project
+
+This is a Shiny Application that performs survival analysis on a small data set included in the application. It been deployed to the ShinyApps.io hosting service at http://dhimrich.shinyapps.io/CourseraSurvival
+
+If you use RStudio, place the server.R and ui.R files, and the life_data.csv file, in the working directory and issue the `shiny::runApp()` command. If you are evaluating this application for the Coursera course, you have been instructed to operate the application at the ShinyApps.io web page.
