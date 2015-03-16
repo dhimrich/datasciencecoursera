@@ -56,6 +56,7 @@ shinyServer(function(input, output) {
     }
   })
   
+  
   output$survplot <- renderPlot({
     plot(display.fit(), main=display.title(), col=1:input$plotType,
          xlab="Run Days", ylab="Proportion Surviving")
@@ -68,14 +69,25 @@ shinyServer(function(input, output) {
   })
   
 
-#   output$bsumm <- renderTable({
-#     summary(display.fit()$table)
-#     
-#   })
+  output$bsumm <- renderTable({
+    if (input$plotType == 1) {
+      as.table(t(summary(display.fit())$table))
+    } else {
+      as.table(summary(display.fit())$table)
+    }
+  })
   
   output$survtable <- renderTable({
-    as.data.frame(summary(display.fit(), times=c(30,90,180,365))[c("time","n.risk",
+    if (input$plotType == 1) {
+      as.data.frame(summary(display.fit(), 
+                          times=c(30,90,180,365))[c("time","n.risk",
                                                   "n.event", "surv")])
+    } else {
+      as.data.frame(summary(display.fit(), 
+                            times=c(30,90,180,365))[c("strata", "time", 
+                                                      "n.risk", "n.event", 
+                                                      "surv")])
+    }
     
   })
   
