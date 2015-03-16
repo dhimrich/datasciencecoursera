@@ -79,7 +79,10 @@ shinyUI(
                  failure, and survival tables summarized at particular times."),
         helpText("The form of the survival tables also depends on whether the analysis
                  is combined, or by asset. At the bottom of the page, the
-                 application displays the data set in tabular form.")
+                 application displays the data set in tabular form."),
+        hr(),
+        helpText("The GitHub repository for this Shiny Application is here:"),
+        a(href="http://github.com/dhimrich/CourseraSurvivalApp", "GitHub Repo")
         
         ),
       
