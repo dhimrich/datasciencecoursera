@@ -19,7 +19,7 @@ shinyServer(function(input, output) {
     life_data.df$End.Date <- life_data.df$Stop.Date
     
     ## For the missing Stop Dates, the End Date is the input follow-up date
-    life_data.df$End.Date[is.na(life_data.df$End.Date)] <- as.Date(input$fdate)
+    life_data.df$End.Date[is.na(life_data.df$Stop.Date)] <- as.Date(input$fdate)
     
     ## Now the run days for each system is End Date less Start Date
     life_data.df$RDays <- as.numeric(life_data.df$End.Date
