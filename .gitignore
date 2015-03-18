@@ -4,6 +4,8 @@
 *.pdf
 *.html
 *.xlsx
+/Shiny Project
+/Slidify_Project
 02_03_commandLineInterface.pdf
 02_07_basicGitCommands.pdf
 03_01_typesOfQuestions.pdf
